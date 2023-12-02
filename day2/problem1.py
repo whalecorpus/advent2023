@@ -42,12 +42,24 @@ class Game:
     
     def printGame(self):
         print("Game", self.num, ":", self.cube_subsets)
-        # for color in ["red", "green", "blue"]:
-        #     print("max", color, "=", self.getMaxColor(color))
 
     def getMaxColor(self, color_string):
         just_color = [subset[color_string] for subset in self.cube_subsets if color_string in subset]
         return max(just_color)
+    
+    def getMinimumMarbles(self):
+        minimum_marble_map = {}
+        for c in const_colors:
+            minimum_marble_map[c] = self.getMaxColor(c)
+        return minimum_marble_map
+    
+    def getGamePower(self):
+        minimum_marble_map = self.getMinimumMarbles()
+        power = 1
+        for c in const_colors:
+            power *= minimum_marble_map[c]
+        return power
+            
 
 def parse_marble_subset(subset):
     subset_maps = []
@@ -62,13 +74,17 @@ def parse_marble_subset(subset):
 with open('input1.txt', 'r') as file:
     # Parsing the file into Games
     games = []
+    sum_of_power = 0
     for line in file:        
         line = line.strip()
         game_and_marbles = line.split(":")
         digit = int(re.search(r'\d+', game_and_marbles[0]).group())
         subsets = parse_marble_subset(game_and_marbles[1].split(";"))
         g = Game(digit, subsets)
-        games.append(g)
+        sum_of_power += g.getGamePower()
+
+    print("Sum of power:", sum_of_power)
     
-    g = Games(games)
-    print(g.sum_ids_of_working_games())
+    # part 1
+    # g = Games(games)
+    # print(g.sum_ids_of_working_games())
