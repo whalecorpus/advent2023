@@ -12,3 +12,11 @@
 
 467     0,0,3
 114     5,0,3
+
+Given a number, you have to search
+    - on the same line, at startx - 1 and endX + 1
+        617
+    - in the line above, at startx - 1 through endX + 1
+        35, 592, 664, 598
+    - in the line below, at startx - 1 through endX + 1
+        467, 633, 755
