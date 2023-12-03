@@ -34,28 +34,12 @@ class Matrix:
         line = self.matrix[n.y]
         if debug:
             print("checking", n.d, "at x (",n.x,") through x2 + 1 (", n.x2 + 1,") inclusive")
-        if sides_debug:
-            print(n.d, "sides: checking ", n.x-1, "and", n.x2 + 1, "; which are")
         if n.x > 0 and self.isSymbol(line[n.x-1]):
-            if sides_debug:
-                print(line[n.x-1])
+            self.addSymbolNeighbor(n.x-1, n.y, n)
             return True
-        elif n.x == 0 and sides_debug:
-            print("blank")
-        else:
-            if sides_debug:
-                print(line[n.x-1])
-        if sides_debug:
-            print("and")
         if n.x2 < len(line) - 1 and self.isSymbol(line[n.x2 + 1]):
-            if sides_debug: 
-                print(line[n.x2 + 1])
+            self.addSymbolNeighbor(n.x2 + 1, n.y, n)
             return True
-        elif n.x2 >= len(line) - 1 and sides_debug:
-            print("blank")
-        else:
-            if sides_debug:
-                print(line[n.x2 + 1])
 
 
         # in the line above, at startx - 1 through endX + 1
@@ -65,9 +49,12 @@ class Matrix:
             end = min(n.x2+2, len(line))
             if debug:
                 print(n.d, "above: scanning from ", start, "to", end, "which is", line[start:end])
+            x = start
             for c in line[start:end]:
                 if self.isSymbol(c):
+                    self.addSymbolNeighbor(x, n.y - 1, n)
                     return True
+                x += 1
 
         # in the line below, at startx - 1 through endX + 1
         if n.y <= len(m.matrix) - 2:
@@ -76,15 +63,48 @@ class Matrix:
             end = min(n.x2+2, len(line))
             if debug:
                 print(n.d, "below: scanning from ", start, "to", end, "which is", line[start:end])
+            x = start
             for c in line[start:end]:
                 if self.isSymbol(c):
+                    self.addSymbolNeighbor(x, n.y + 1, n)
                     return True
+                x += 1
 
         return False
     
     def isSymbol(self, ch):
         symbols = re.findall(r"[!@#$%^&*()\-_=+\[\]{};:'\",<>\/?|\\~]", ch)
         return len(symbols) > 0
+    
+    def addSymbolNeighbor(self, x, y, n):
+        for sy in self.symbols:
+            if x == sy.x and y == sy.y:
+                sy.addNeighbor(n)
+
+    def printSymbolNeighbors(self):
+        for s in self.symbols:
+            print(s.d, "symbol at ", s.x, ",", s.y, ":")
+            for n in s.neighbors:
+                print(n.d, ",")
+
+    def findGears(self):
+        debug = False
+        sum = 0
+        gears = {}
+        for s in self.symbols:
+            if debug:
+                print(s.d, s.neighbors, len(s.neighbors))
+            if len(s.neighbors) == 2:
+                gear_key = s.d+ "(" + str(s.x) + "," + str(s.y) +")"
+                gears[gear_key] = s.neighbors[0].d * s.neighbors[1].d
+                gear_ratio = s.neighbors[0].d * s.neighbors[1].d
+                if debug:
+                    print("adding", gear_ratio, "to gear ratio sum")
+                sum += gear_ratio
+
+        return gears, sum
+                
+
     
     def allPartNumbers(self):
         friendly_nums = []
@@ -95,8 +115,8 @@ class Matrix:
             else:
                 unfriendly_nums.append(n.d)
 
-        # print ("all friendly numbers:", friendly_nums)
-        # print ("all unfriendly numbers:", unfriendly_nums)
+        print ("all friendly numbers:", friendly_nums)
+        print ("all unfriendly numbers:", unfriendly_nums)
         return friendly_nums
 
     def sumPartNumbers(self):
@@ -106,9 +126,6 @@ class Matrix:
             sum += n
         return sum
 
-
-
-
 class Matrix_Number:
     def __init__(self, startX, startY, endX, number):
         self.x = startX
@@ -117,12 +134,16 @@ class Matrix_Number:
         self.y = startY
         self.d = int(number)
 
-        # calculate how many digits in number
-
 class Matrix_Symbol:
-    def __init__(self, x, y):
+    def __init__(self, x, y, d):
         self.x = x
         self.y = y
+        self.d = d
+        self.neighbors = []
+
+    def addNeighbor(self, n):
+        # add number as neighbor
+        self.neighbors.append(n)
 
 # filename = "test_input.txt"
 filename = "input.txt"
@@ -140,12 +161,14 @@ with open(filename, 'r') as file:
             span = match.span()
             m.addNum(Matrix_Number(span[0], y, span[1]-1, match.group()))
         # if you wanted a list of all the symbols:
-        # symbols = re.finditer(r"[!@#$%^&*()\-_=+\[\]{};:'\",<>\/?|\\~]", line)
-        # for match in symbols:
-        #     span = match.span()
-        #     m.addSym(Matrix_Symbol(span[0], y))
+        symbols = re.finditer(r"[!@#$%^&*()\-_=+\[\]{};:'\",<>\/?|\\~]", line)
+        for match in symbols:
+            span = match.span()
+            m.addSym(Matrix_Symbol(span[0], y, match.group()))
 
         y += 1 # going down the matrix
     
-    sum_q1 = m.sumPartNumbers()
-    print(sum_q1)
+    sum_q1 = m.allPartNumbers()
+    gears, summedGearRatio = m.findGears()
+    print("Gears:", gears)
+    print("sum gear ratio: ", summedGearRatio)
