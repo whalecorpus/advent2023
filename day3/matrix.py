@@ -28,34 +28,55 @@ class Matrix:
     # Given a number, you have to search
     
     def hasSymbolNeighbors(self, n):
-        debug = False
-        if n.d == 664:
-            debug = True
+        debug = True
+        sides_debug = False
         # on the same line, at startx - 1 and endX + 1
         line = self.matrix[n.y]
+        print(line)
+        if debug:
+            print("checking", n.d, "at x (",n.x,") through x2 + 1 (", n.x2 + 1,") inclusive")
+        if sides_debug:
+            print(n.d, "sides: checking ", n.x-1, "and", n.x2 + 1, "; which are")
         if n.x > 0 and self.isSymbol(line[n.x-1]):
+            if sides_debug:
+                print(line[n.x-1])
             return True
-        if n.x < len(line) - 1 and self.isSymbol(line[n.x2]):
+        elif n.x == 0 and sides_debug:
+            print("blank")
+        else:
+            if sides_debug:
+                print(line[n.x-1])
+        if sides_debug:
+            print("and")
+        if n.x2 < len(line) - 1 and self.isSymbol(line[n.x2 + 1]):
+            if sides_debug: 
+                print(line[n.x2 + 1])
             return True
+        elif n.x2 >= len(line) - 1 and sides_debug:
+            print("blank")
+        else:
+            if sides_debug:
+                print(line[n.x2 + 1])
+
 
         # in the line above, at startx - 1 through endX + 1
         if n.y > 0:
             line = self.matrix[n.y - 1]
             start = max(0, n.x - 1)
-            end = max(n.x2, len(line) - 1)
+            end = min(n.x2+2, len(line))
             if debug:
-                print("above: scanning from ", start, "to", end, "on line", line, "; which is", line[start:end])
+                print(n.d, "above: scanning from ", start, "to", end, "on line", line, "; which is", line[start:end])
             for c in line[start:end]:
                 if self.isSymbol(c):
                     return True
 
         # in the line below, at startx - 1 through endX + 1
-        if n.y <= len(line) - 2:
+        if n.y <= len(m.matrix) - 2:
             line = self.matrix[n.y + 1]
             start = max(0, n.x - 1)
-            end = max(n.x2, len(line) - 1)
+            end = min(n.x2+2, len(line))
             if debug:
-                print("below: scanning from ", start, "to", end, "on line", line, "; which is", line[start:end])
+                print(n.d, "below: scanning from ", start, "to", end, "on line", line, "; which is", line[start:end])
             for c in line[start:end]:
                 if self.isSymbol(c):
                     return True
@@ -104,8 +125,8 @@ class Matrix_Symbol:
         self.x = x
         self.y = y
 
-filename = "test_input.txt"
-# filename = "input.txt"
+# filename = "test_input.txt"
+filename = "input.txt"
 with open(filename, 'r') as file:
     # Parsing the file into Numbers
     games = []
@@ -113,12 +134,12 @@ with open(filename, 'r') as file:
     y = 0
     m = Matrix([],[])
     for line in file:
-        line.strip()
-        m.addRow(list(line))
-        nums = re.finditer(r'\d+', line)
+        real_line = line.rstrip('\n')
+        m.addRow(list(real_line))
+        nums = re.finditer(r'\d+', real_line)
         for match in nums:
             span = match.span()
-            m.addNum(Matrix_Number(span[0], y, span[1], match.group()))
+            m.addNum(Matrix_Number(span[0], y, span[1]-1, match.group()))
         # if you wanted a list of all the symbols:
         # symbols = re.finditer(r"[!@#$%^&*()\-_=+\[\]{};:'\",<>\/?|\\~]", line)
         # for match in symbols:
@@ -129,3 +150,5 @@ with open(filename, 'r') as file:
     
     sum_q1 = m.sumPartNumbers()
     print(sum_q1)
+    for line in m.matrix:
+        print(line)
