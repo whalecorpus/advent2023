@@ -20,3 +20,24 @@ Given a number, you have to search
         35, 592, 664, 598
     - in the line below, at startx - 1 through endX + 1
         467, 633, 755
+
+
+More complicated test input:
+5abcdefghi
+467ab114cd
+efg*hijklm
+no35pq633r
+stuvwz#yz6
+617*abcde$
+fghij+k58l
+mn592opqrs
+tuvwxy755z
+abc$d*efgh
+i4jklmnopq
+rstuvwxy84
+z664a598bc
+defg*hij$l
+mn4opqr88$
+
+
+## Part Two

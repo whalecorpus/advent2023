@@ -28,11 +28,10 @@ class Matrix:
     # Given a number, you have to search
     
     def hasSymbolNeighbors(self, n):
-        debug = True
+        debug = False
         sides_debug = False
         # on the same line, at startx - 1 and endX + 1
         line = self.matrix[n.y]
-        print(line)
         if debug:
             print("checking", n.d, "at x (",n.x,") through x2 + 1 (", n.x2 + 1,") inclusive")
         if sides_debug:
@@ -65,7 +64,7 @@ class Matrix:
             start = max(0, n.x - 1)
             end = min(n.x2+2, len(line))
             if debug:
-                print(n.d, "above: scanning from ", start, "to", end, "on line", line, "; which is", line[start:end])
+                print(n.d, "above: scanning from ", start, "to", end, "which is", line[start:end])
             for c in line[start:end]:
                 if self.isSymbol(c):
                     return True
@@ -76,7 +75,7 @@ class Matrix:
             start = max(0, n.x - 1)
             end = min(n.x2+2, len(line))
             if debug:
-                print(n.d, "below: scanning from ", start, "to", end, "on line", line, "; which is", line[start:end])
+                print(n.d, "below: scanning from ", start, "to", end, "which is", line[start:end])
             for c in line[start:end]:
                 if self.isSymbol(c):
                     return True
@@ -96,8 +95,8 @@ class Matrix:
             else:
                 unfriendly_nums.append(n.d)
 
-        print ("all friendly numbers:", friendly_nums)
-        print ("all unfriendly numbers:", unfriendly_nums)
+        # print ("all friendly numbers:", friendly_nums)
+        # print ("all unfriendly numbers:", unfriendly_nums)
         return friendly_nums
 
     def sumPartNumbers(self):
@@ -150,5 +149,3 @@ with open(filename, 'r') as file:
     
     sum_q1 = m.sumPartNumbers()
     print(sum_q1)
-    for line in m.matrix:
-        print(line)
